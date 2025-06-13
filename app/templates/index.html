@@ -1,0 +1,32 @@
+<!-- app/templates/index.html (CORREGIDO) -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search People</title>
+    <!-- CORRECCIÓN AQUÍ -->
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+    <!-- Incluye Font Awesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="search-container">
+        <!-- ... (el resto del body no cambia) ... -->
+        <div class="search-bar">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search people by name or email">
+            <span class="separator"></span>
+            <i class="fas fa-sliders-h filter-icon"></i>
+        </div>
+
+        <ul id="suggestionsDropdown" class="suggestions-dropdown">
+        </ul>
+    </div>
+
+    <!-- CORRECCIÓN AQUÍ -->
+    <script src="{{ url_for('static', path='script.js') }}"></script>
+</body>
+</html>

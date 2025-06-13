@@ -1,0 +1,182 @@
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #282c34; /* Fondo oscuro */
+    color: #e0e0e0; /* Color de texto general */
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    min-height: 100vh; /* Altura mínima de la vista */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.search-container {
+    width: 100%;
+    max-width: 600px; /* Ancho máximo del contenedor */
+    position: relative; /* Necesario para posicionar el dropdown si se quisiera absolute, pero lo usaremos en flujo normal */
+    display: flex;
+    flex-direction: column; /* Apila la barra y el dropdown */
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #3c4049; /* Fondo de la barra de búsqueda */
+    border-radius: 24px; /* Bordes redondeados */
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Sombra sutil */
+    position: relative; /* Para el pseudo-elemento del foco */
+    z-index: 2; /* Asegura que esté por encima del dropdown si hay solapamiento */
+}
+
+.search-bar::before {
+    content: '';
+    position: absolute;
+    top: 0; /* Posiciona la línea amarilla en la parte superior */
+    left: 0;
+    right: 0;
+    height: 2px; /* Grosor de la línea */
+    background-color: #fbbc05; /* Color amarillo */
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    opacity: 0; /* Oculta por defecto */
+    transform: scaleX(0); /* Empieza colapsada */
+    transform-origin: left;
+    transition: transform 0.3s ease, opacity 0.3s ease; /* Transición para la animación */
+}
+
+.search-bar.focused::before {
+    opacity: 1; /* Muestra cuando tiene foco */
+    transform: scaleX(1); /* Expande a ancho completo */
+}
+
+
+.search-bar input {
+    flex-grow: 1; /* El input ocupa el espacio disponible */
+    border: none;
+    outline: none; /* Quita el borde de foco por defecto */
+    background: none;
+    color: #e0e0e0; /* Color del texto escrito */
+    font-size: 1rem;
+    padding: 0 10px; /* Espacio entre el icono y el texto, y entre texto y separador */
+}
+
+.search-bar input::placeholder {
+    color: #a0a0a0; /* Color del placeholder */
+}
+
+.search-bar .search-icon,
+.search-bar .filter-icon {
+    color: #a0a0a0; /* Color de los iconos */
+    font-size: 1.2rem;
+    cursor: pointer; /* Indica que son interactivos (aunque no tengan JS) */
+}
+
+.search-bar .search-icon {
+     /* margin-right se añade en el padding del input */
+}
+
+.search-bar .filter-icon {
+     /* margin-left se añade en el padding del input */
+}
+
+.separator {
+    width: 1px; /* Ancho del separador */
+    height: 20px; /* Altura del separador */
+    background-color: #555; /* Color del separador */
+    margin: 0 15px; /* Espacio a los lados del separador */
+}
+
+.suggestions-dropdown {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0; /* Pequeño margen superior */
+    background-color: #3c4049; /* Fondo del dropdown */
+    border-bottom-left-radius: 8px; /* Bordes redondeados inferiores */
+    border-bottom-right-radius: 8px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); /* Sombra */
+    max-height: 300px; /* Altura máxima antes de scroll */
+    overflow-y: auto; /* Scroll si hay muchas sugerencias */
+    /* border: 1px solid #555; /* Borde sutil */
+    border-top: none; /* Sin borde superior */
+    display: none; /* Oculto por defecto */
+    z-index: 1; /* Asegura que esté debajo de la barra cuando no tiene foco */
+    /* Si quieres que el borde sea visible, quita el 'border-top: none' y ajusta el margin-top */
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #4a4e55; /* Separador entre items */
+}
+
+.suggestion-item:last-child {
+    border-bottom: none; /* Sin separador en el último item */
+}
+
+.suggestion-item:hover {
+    background-color: #4a4e55; /* Fondo al pasar el ratón */
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* Forma circular */
+    background-color: #555; /* Fondo del avatar por defecto */
+    color: #e0e0e0; /* Color del icono/letra */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    margin-right: 15px;
+    overflow: hidden; /* Oculta contenido si es una imagen y se desborda */
+}
+
+.avatar.letter {
+    background-color: #fbbc05; /* Color de fondo para avatar de letra */
+    color: #282c34; /* Color de letra */
+    font-weight: bold;
+}
+
+.avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Asegura que la imagen cubra el círculo */
+}
+
+
+.text-content {
+    flex-grow: 1; /* Ocupa el espacio disponible entre avatar y checkmark */
+}
+
+.text-content .name {
+    font-size: 1rem;
+    color: #e0e0e0;
+}
+
+.text-content .name strong {
+     font-weight: normal; /* Para que el nombre no esté en negrita por defecto si usas <strong> */
+     color: #ffffff; /* Color ligeramente más blanco para el nombre */
+}
+
+
+.text-content .description {
+    font-size: 0.85rem;
+    color: #a0a0a0; /* Color de la descripción */
+    margin-top: 2px;
+}
+
+.checked {
+    color: #5cb85c; /* Color del checkmark (verde) */
+    font-size: 1.2rem;
+    margin-left: 10px;
+}
+
+/* Clase para ocultar el checkmark */
+.checked.hidden {
+    visibility: hidden;
+}
