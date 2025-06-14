@@ -196,3 +196,5 @@ cython_debug/
 auto_commit_ai.py
 get_metadata_prompt.py
 metadata.txt
+bios_recolectados.json
+all_usernames.json
