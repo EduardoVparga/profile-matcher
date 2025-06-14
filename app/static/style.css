@@ -1,76 +1,76 @@
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background-color: #282c34; /* Fondo oscuro */
-    color: #e0e0e0; /* Color de texto general */
+    background-color: #282c34; 
+    color: #e0e0e0; 
     display: flex;
-    justify-content: center; /* Centra horizontalmente */
-    align-items: center; /* Centra verticalmente */
-    min-height: 100vh; /* Altura mínima de la vista */
+    justify-content: center;
+    align-items: center; 
+    min-height: 100vh; 
     padding: 20px;
     box-sizing: border-box;
 }
 
 .search-container {
     width: 100%;
-    max-width: 600px; /* Ancho máximo del contenedor */
-    position: relative; /* Necesario para posicionar el dropdown si se quisiera absolute, pero lo usaremos en flujo normal */
+    max-width: 600px; 
+    position: relative; 
     display: flex;
-    flex-direction: column; /* Apila la barra y el dropdown */
+    flex-direction: column; 
 }
 
 .search-bar {
     display: flex;
     align-items: center;
-    background-color: #3c4049; /* Fondo de la barra de búsqueda */
-    border-radius: 24px; /* Bordes redondeados */
+    background-color: #3c4049; 
+    border-radius: 24px; 
     padding: 10px 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Sombra sutil */
-    position: relative; /* Para el pseudo-elemento del foco */
-    z-index: 2; /* Asegura que esté por encima del dropdown si hay solapamiento */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); 
+    position: relative; 
+    z-index: 2; 
 }
 
 .search-bar::before {
     content: '';
     position: absolute;
-    top: 0; /* Posiciona la línea amarilla en la parte superior */
+    top: 0; 
     left: 0;
     right: 0;
-    height: 2px; /* Grosor de la línea */
-    background-color: #fbbc05; /* Color amarillo */
+    height: 2px; 
+    background-color: #fbbc05; 
     border-top-left-radius: 24px;
     border-top-right-radius: 24px;
-    opacity: 0; /* Oculta por defecto */
-    transform: scaleX(0); /* Empieza colapsada */
+    opacity: 0; 
+    transform: scaleX(0); 
     transform-origin: left;
-    transition: transform 0.3s ease, opacity 0.3s ease; /* Transición para la animación */
+    transition: transform 0.3s ease, opacity 0.3s ease; 
 }
 
 .search-bar.focused::before {
-    opacity: 1; /* Muestra cuando tiene foco */
-    transform: scaleX(1); /* Expande a ancho completo */
+    opacity: 1; 
+    transform: scaleX(1); 
 }
 
 
 .search-bar input {
-    flex-grow: 1; /* El input ocupa el espacio disponible */
+    flex-grow: 1; 
     border: none;
-    outline: none; /* Quita el borde de foco por defecto */
+    outline: none; 
     background: none;
-    color: #e0e0e0; /* Color del texto escrito */
+    color: #e0e0e0; 
     font-size: 1rem;
-    padding: 0 10px; /* Espacio entre el icono y el texto, y entre texto y separador */
+    padding: 0 10px; 
 }
 
 .search-bar input::placeholder {
-    color: #a0a0a0; /* Color del placeholder */
+    color: #a0a0a0; 
 }
 
 .search-bar .search-icon,
 .search-bar .filter-icon {
-    color: #a0a0a0; /* Color de los iconos */
+    color: #a0a0a0; 
     font-size: 1.2rem;
-    cursor: pointer; /* Indica que son interactivos (aunque no tengan JS) */
+    cursor: pointer; 
 }
 
 .search-bar .search-icon {
@@ -82,27 +82,25 @@ body {
 }
 
 .separator {
-    width: 1px; /* Ancho del separador */
-    height: 20px; /* Altura del separador */
-    background-color: #555; /* Color del separador */
-    margin: 0 15px; /* Espacio a los lados del separador */
+    width: 1px; 
+    height: 20px; 
+    background-color: #555; 
+    margin: 0 15px; 
 }
 
 .suggestions-dropdown {
     list-style: none;
     padding: 0;
-    margin: 5px 0 0 0; /* Pequeño margen superior */
-    background-color: #3c4049; /* Fondo del dropdown */
-    border-bottom-left-radius: 8px; /* Bordes redondeados inferiores */
+    margin: 5px 0 0 0; 
+    background-color: #3c4049; 
+    border-bottom-left-radius: 8px; 
     border-bottom-right-radius: 8px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); /* Sombra */
-    max-height: 300px; /* Altura máxima antes de scroll */
-    overflow-y: auto; /* Scroll si hay muchas sugerencias */
-    /* border: 1px solid #555; /* Borde sutil */
-    border-top: none; /* Sin borde superior */
-    display: none; /* Oculto por defecto */
-    z-index: 1; /* Asegura que esté debajo de la barra cuando no tiene foco */
-    /* Si quieres que el borde sea visible, quita el 'border-top: none' y ajusta el margin-top */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); 
+    max-height: 300px; 
+    overflow-y: auto; 
+    border-top: none; 
+    display: none; 
+    z-index: 1; 
 }
 
 .suggestion-item {
@@ -110,34 +108,34 @@ body {
     align-items: center;
     padding: 12px 20px;
     cursor: pointer;
-    border-bottom: 1px solid #4a4e55; /* Separador entre items */
+    border-bottom: 1px solid #4a4e55; 
 }
 
 .suggestion-item:last-child {
-    border-bottom: none; /* Sin separador en el último item */
+    border-bottom: none; 
 }
 
 .suggestion-item:hover {
-    background-color: #4a4e55; /* Fondo al pasar el ratón */
+    background-color: #4a4e55; 
 }
 
 .avatar {
     width: 40px;
     height: 40px;
-    border-radius: 50%; /* Forma circular */
-    background-color: #555; /* Fondo del avatar por defecto */
-    color: #e0e0e0; /* Color del icono/letra */
+    border-radius: 50%; 
+    background-color: #555; 
+    color: #e0e0e0; 
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 1.2rem;
     margin-right: 15px;
-    overflow: hidden; /* Oculta contenido si es una imagen y se desborda */
+    overflow: hidden; 
 }
 
 .avatar.letter {
-    background-color: #fbbc05; /* Color de fondo para avatar de letra */
-    color: #282c34; /* Color de letra */
+    background-color: #fbbc05; 
+    color: #282c34; 
     font-weight: bold;
 }
 
@@ -145,12 +143,12 @@ body {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Asegura que la imagen cubra el círculo */
+    object-fit: cover; 
 }
 
 
 .text-content {
-    flex-grow: 1; /* Ocupa el espacio disponible entre avatar y checkmark */
+    flex-grow: 1; 
 }
 
 .text-content .name {
@@ -159,24 +157,184 @@ body {
 }
 
 .text-content .name strong {
-     font-weight: normal; /* Para que el nombre no esté en negrita por defecto si usas <strong> */
-     color: #ffffff; /* Color ligeramente más blanco para el nombre */
+     font-weight: normal; 
+     color: #ffffff; 
 }
 
 
 .text-content .description {
     font-size: 0.85rem;
-    color: #a0a0a0; /* Color de la descripción */
+    color: #a0a0a0; 
     margin-top: 2px;
 }
 
 .checked {
-    color: #5cb85c; /* Color del checkmark (verde) */
+    color: #5cb85c; 
     font-size: 1.2rem;
     margin-left: 10px;
 }
 
-/* Clase para ocultar el checkmark */
 .checked.hidden {
     visibility: hidden;
+}
+
+
+/* ============ ESTILOS DEL MODAL ============ */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background-color: rgba(30, 32, 38, 0.6);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); 
+
+    display: none; 
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+.modal-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+.profile-modal {
+    background-color: #3c4049;
+    color: #e0e0e0;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 700px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    position: relative;
+    max-height: 85vh;
+    overflow-y: auto;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.show .profile-modal {
+    transform: scale(1);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 2rem;
+    color: #a0a0a0;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    color: #ffffff;
+}
+
+.modal-content .loader {
+    border: 4px solid #555;
+    border-top: 4px solid #fbbc05;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 50px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #4a4e55;
+    padding-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #ffffff;
+    text-transform: capitalize;
+}
+
+.modal-header .remoter-badge {
+    background-color: #5cb85c;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-left: 15px;
+    font-weight: bold;
+}
+
+.modal-body p {
+    line-height: 1.6;
+    color: #c0c0c0;
+    font-style: italic;
+    margin-bottom: 25px;
+}
+
+.modal-section-title {
+    font-size: 1.2rem;
+    color: #fbbc05;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #555;
+    padding-bottom: 5px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    text-align: center;
+}
+
+.stat-item {
+    background-color: #4a4e55;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.stat-item .value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.stat-item .label {
+    font-size: 0.85rem;
+    color: #a0a0a0;
+    margin-top: 5px;
+}
+
+.strength-highlight {
+    background-color: #282c34;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #fbbc05;
+}
+
+.strength-highlight .name {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.strength-highlight .proficiency {
+    font-size: 0.9rem;
+    color: #a0a0a0;
+    text-transform: capitalize;
+    margin-top: 4px;
 }

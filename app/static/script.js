@@ -1,86 +1,60 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const suggestionsDropdown = document.getElementById('suggestionsDropdown');
-    const searchBar = document.querySelector('.search-bar'); // Referencia a la barra completa
+    const searchBar = document.querySelector('.search-bar');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const profileModal = document.getElementById('profileModal');
+    const modalContent = document.getElementById('modalContent');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    
+    let debounceTimer;
 
-    // Datos de ejemplo (simulando una respuesta de búsqueda)
-    const peopleData = [
-        { name: 'Eduardo Valenzuela Parga', description: 'Problem solver', avatar: 'img/eduardo1.jpg', checked: false },
-        { name: 'Luis Eduardo Brochet Fernandez', description: 'Analyst', avatar: 'img/luis.jpg', checked: true },
-        { name: 'Eduardo Uribe Mejia', description: 'International business negotiator', avatar: 'img/eduardo2.jpg', checked: true },
-        { name: 'Eduardo Castro', description: 'Director', avatar: 'E', checked: false }, // Avatar de letra
-        { name: 'Carlos Eduardo Beltran Molina', description: 'Ops Engineer', avatar: 'C', checked: true }, // Avatar de letra
-        { name: 'Carlos Eduardo Rodriguez Lozano', description: 'CTO at Instaleop', avatar: 'C', checked: true }, // Avatar de letra
-         { name: 'Ana Maria Perez', description: 'Marketing Specialist', avatar: 'A', checked: false },
-         { name: 'Juan Pablo Gomez', description: 'Software Developer', avatar: 'J', checked: true },
-         { name: 'Sofia Carolina Diaz', description: 'Project Manager', avatar: 'S', checked: false },
-    ];
+    function renderSuggestions(peopleData = []) {
+        suggestionsDropdown.innerHTML = ''; 
 
-    // Función para renderizar las sugerencias
-    function renderSuggestions(filterText = '') {
-        suggestionsDropdown.innerHTML = ''; // Limpiar sugerencias anteriores
-        const lowerCaseFilterText = filterText.toLowerCase();
-
-        const filteredPeople = peopleData.filter(person =>
-            person.name.toLowerCase().includes(lowerCaseFilterText) // Simple filtro por nombre
-        );
-
-        if (filteredPeople.length === 0 && filterText.length > 0) {
-             // Opcional: Mostrar un mensaje si no hay resultados
+        if (peopleData.length === 0 && searchInput.value.trim().length > 0) {
              const noResultsItem = document.createElement('li');
              noResultsItem.classList.add('suggestion-item');
              noResultsItem.style.justifyContent = 'center';
-             noResultsItem.style.fontStyle = 'italic';
-             noResultsItem.style.color = '#a0a0a0';
              noResultsItem.textContent = 'No results found';
              suggestionsDropdown.appendChild(noResultsItem);
         } else {
-            filteredPeople.forEach(person => {
+            peopleData.forEach(person => {
+                if (!person.publicId) return;
+
                 const listItem = document.createElement('li');
                 listItem.classList.add('suggestion-item');
+                listItem.dataset.publicid = person.publicId;
 
-                // Crear el avatar
                 const avatarDiv = document.createElement('div');
                 avatarDiv.classList.add('avatar');
-                if (person.avatar.length === 1) { // Es una letra
-                    avatarDiv.classList.add('letter');
-                    avatarDiv.textContent = person.avatar;
-                } else if (person.avatar.startsWith('img/')) { // Es una ruta de imagen
+                if (person.avatar && person.avatar.startsWith('http')) {
                     const img = document.createElement('img');
                     img.src = person.avatar;
                     img.alt = person.name;
                     avatarDiv.appendChild(img);
-                } else { // Avatar por defecto (icono)
+                } else { 
                      const icon = document.createElement('i');
-                     icon.classList.add('fas', 'fa-user'); // Icono de usuario por defecto
+                     icon.classList.add('fas', 'fa-user');
                      avatarDiv.appendChild(icon);
                 }
                 listItem.appendChild(avatarDiv);
-
-                // Crear el contenido de texto (Nombre y descripción)
+                
                 const textContentDiv = document.createElement('div');
                 textContentDiv.classList.add('text-content');
-
                 const nameDiv = document.createElement('div');
                 nameDiv.classList.add('name');
-                // Aquí puedes formatear "Person: Nombre Apellido"
-                const personLabel = document.createElement('span');
-                personLabel.textContent = 'Person: ';
                 const strongName = document.createElement('strong');
-                strongName.textContent = person.name; // El nombre completo
-                nameDiv.appendChild(personLabel);
+                strongName.textContent = person.name;
                 nameDiv.appendChild(strongName);
-
-
                 const descriptionDiv = document.createElement('div');
                 descriptionDiv.classList.add('description');
                 descriptionDiv.textContent = person.description;
-
                 textContentDiv.appendChild(nameDiv);
                 textContentDiv.appendChild(descriptionDiv);
                 listItem.appendChild(textContentDiv);
-
-                // Añadir el checkmark si está marcado
+                
                 if (person.checked) {
                     const checkIcon = document.createElement('i');
                     checkIcon.classList.add('fas', 'fa-check-circle', 'checked');
@@ -90,62 +64,142 @@ document.addEventListener('DOMContentLoaded', () => {
                 suggestionsDropdown.appendChild(listItem);
             });
         }
-
-
     }
 
-    // Evento al escribir en el input
-    searchInput.addEventListener('input', () => {
-        const filterText = searchInput.value.trim(); // Obtener el valor y quitar espacios al inicio/final
+    function renderModalContent(data) {
+        modalContent.innerHTML = `
+            <div class="modal-header">
+                <h2>${data.name || 'Unknown'}</h2>
+                ${data.remoter ? '<span class="remoter-badge">Remoter</span>' : ''}
+            </div>
+            <div class="modal-body">
+                <p>${data.summary_of_bio || 'No summary available.'}</p>
 
-        if (filterText.length > 0) {
-            renderSuggestions(filterText); // Renderizar sugerencias (puedes pasar el texto para filtrar)
-            suggestionsDropdown.style.display = 'block'; // Mostrar el dropdown
-        } else {
-            suggestionsDropdown.style.display = 'none'; // Ocultar si el input está vacío
-            suggestionsDropdown.innerHTML = ''; // Limpiar el contenido
+                <h3 class="modal-section-title">Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="value">${data.stats_strengths}</div>
+                        <div class="label">Strengths</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="value">${data.stats_jobs}</div>
+                        <div class="label">Jobs</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="value">${data.stats_education}</div>
+                        <div class="label">Education</div>
+                    </div>
+                </div>
+
+                <h3 class="modal-section-title">Top Strength</h3>
+                ${data.top_strength_name ? `
+                    <div class="strength-highlight">
+                        <div class="name">${data.top_strength_name}</div>
+                        <div class="proficiency">${data.top_strength_proficiency.replace('-', ' ')}</div>
+                    </div>
+                ` : '<p>No strengths listed.</p>'}
+
+                <h3 class="modal-section-title">Last Job</h3>
+                <p><strong>Period:</strong> ${data.last_job_period || 'N/A'}</p>
+                <p><strong>Location:</strong> ${data.location || 'N/A'}</p>
+            </div>
+        `;
+    }
+
+    // Función para abrir y cargar los datos del modal
+    async function openProfileModal(username) {
+        modalOverlay.classList.add('show');
+        profileModal.classList.add('show');
+        modalContent.innerHTML = '<div class="loader"></div>'; 
+
+        try {
+            const response = await fetch(`/api/person/${username}`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to load profile.');
+            }
+            const profileData = await response.json();
+            renderModalContent(profileData);
+        } catch (error) {
+            modalContent.innerHTML = `<p style="color: #ff6b6b; text-align: center;">Error: ${error.message}</p>`;
+            console.error('Error fetching profile details:', error);
+        }
+    }
+
+    function closeProfileModal() {
+        modalOverlay.classList.remove('show');
+        profileModal.classList.remove('show');
+        setTimeout(() => {
+            modalContent.innerHTML = '';
+        }, 300); 
+    }
+
+    const search = async (query) => {
+        if (query.length === 0) {
+            suggestionsDropdown.style.display = 'none';
+            return;
+        }
+        try {
+            const response = await fetch('/api/search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: query }),
+            });
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            const peopleData = await response.json();
+            renderSuggestions(peopleData);
+            suggestionsDropdown.style.display = 'block';
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+            suggestionsDropdown.innerHTML = '<li class="suggestion-item" style="color: #ff6b6b;">Error loading results</li>';
+            suggestionsDropdown.style.display = 'block';
+        }
+    };
+
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+        clearTimeout(debounceTimer);
+        if (query.length === 0) {
+            suggestionsDropdown.style.display = 'none';
+            return;
+        }
+        debounceTimer = setTimeout(() => search(query), 200);
+    });
+
+    suggestionsDropdown.addEventListener('click', (event) => {
+        const item = event.target.closest('.suggestion-item');
+        if (item && item.dataset.publicid) {
+            const username = item.dataset.publicid;
+            openProfileModal(username);
+            searchInput.value = '';
+            suggestionsDropdown.style.display = 'none';
         }
     });
 
-    // Evento al enfocar el input (para la línea amarilla)
+    modalCloseBtn.addEventListener('click', closeProfileModal);
+    modalOverlay.addEventListener('click', (event) => {
+        if (event.target === modalOverlay) { 
+            closeProfileModal();
+        }
+    });
+
     searchInput.addEventListener('focus', () => {
         searchBar.classList.add('focused');
-        // Si el input tiene contenido al enfocar, mostrar el dropdown
         if (searchInput.value.trim().length > 0) {
-             renderSuggestions(searchInput.value.trim());
-             suggestionsDropdown.style.display = 'block';
+            search(searchInput.value.trim());
         }
     });
 
-    // Evento al perder el foco del input (para la línea amarilla y ocultar dropdown)
     searchInput.addEventListener('blur', () => {
         searchBar.classList.remove('focused');
-
-        // Pequeño retraso para permitir clicks en las sugerencias antes de ocultar
         setTimeout(() => {
-            // Comprobar si el foco se ha movido a un elemento dentro del dropdown (opcional, más complejo)
-            // Para este ejemplo simple, simplemente lo ocultamos
-             suggestionsDropdown.style.display = 'none';
-        }, 100); // Ajusta el tiempo si es necesario
-
-    });
-
-    // Opcional: Manejar click en una sugerencia (ejemplo: pone el nombre en el input)
-    suggestionsDropdown.addEventListener('click', (event) => {
-        const item = event.target.closest('.suggestion-item'); // Encuentra el item más cercano
-        if (item) {
-            // Encuentra el nombre dentro del item cliqueado
-            const nameElement = item.querySelector('.text-content .name strong');
-            if (nameElement) {
-                searchInput.value = nameElement.textContent; // Pone el nombre en el input
-                suggestionsDropdown.style.display = 'none'; // Oculta el dropdown
-                 // Opcional: Aquí podrías simular una búsqueda o navegación
-                 console.log('Seleccionado:', searchInput.value);
+            if (!modalOverlay.classList.contains('show')) {
+                 suggestionsDropdown.style.display = 'none';
             }
-        }
+        }, 200);
     });
-
-    // Inicialmente ocultar el dropdown
+    
     suggestionsDropdown.style.display = 'none';
-
 });
