@@ -7,6 +7,9 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
+class StrengthDetail(BaseModel):
+    name: Optional[str] = None
+    proficiency: Optional[str] = None
 
 class Person(BaseModel):
     name: str
@@ -27,8 +30,7 @@ class PersonDetails(BaseModel):
     stats_jobs: int = 0
     stats_education: int = 0
     stats_strengths: int = 0
-    top_strength_name: Optional[str] = None
-    top_strength_proficiency: Optional[str] = None
+    strengths: List[StrengthDetail] = [] 
     last_job_period: Optional[str] = None
 
 app = FastAPI()
@@ -93,10 +95,6 @@ async def search_people(search_request: SearchRequest):
 
 @app.get("/api/person/{username}", response_model=PersonDetails)
 async def get_person_details(username: str):
-    """
-    Obtiene los detalles de un perfil de usuario específico desde la API de Torre
-    y devuelve solo los campos necesarios para el modal.
-    """
     if not username:
         raise HTTPException(status_code=400, detail="Username cannot be empty")
 
@@ -122,13 +120,15 @@ async def get_person_details(username: str):
                 last_job = jobs_data[0]
                 from_date = f"{last_job.get('fromMonth', '')} {last_job.get('fromYear', '')}".strip()
                 to_date = f"{last_job.get('toMonth', '')} {last_job.get('toYear', '')}".strip()
-                if to_date:
+                if to_date and to_date != from_date:
                     last_job_period = f"{from_date} - {to_date}"
                 else:
                     last_job_period = f"{from_date} - Present"
 
-            top_strength_name = strengths_data[0].get("name") if strengths_data else None
-            top_strength_proficiency = strengths_data[0].get("proficiency") if strengths_data else None
+            processed_strengths = [
+                StrengthDetail(name=s.get("name"), proficiency=s.get("proficiency"))
+                for s in strengths_data
+            ]
             
             details = PersonDetails(
                 name=person_data.get("name", "N/A"),
@@ -139,8 +139,7 @@ async def get_person_details(username: str):
                 stats_jobs=stats_data.get("jobs", 0),
                 stats_education=stats_data.get("education", 0),
                 stats_strengths=stats_data.get("strengths", 0),
-                top_strength_name=top_strength_name,
-                top_strength_proficiency=top_strength_proficiency,
+                strengths=processed_strengths, # Se pasa la lista completa
                 last_job_period=last_job_period
             )
             return details

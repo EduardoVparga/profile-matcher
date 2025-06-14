@@ -1,8 +1,8 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const suggestionsDropdown = document.getElementById('suggestionsDropdown');
     const searchBar = document.querySelector('.search-bar');
+    const searchContainer = document.querySelector('.search-container');
     const modalOverlay = document.getElementById('modalOverlay');
     const profileModal = document.getElementById('profileModal');
     const modalContent = document.getElementById('modalContent');
@@ -20,12 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
              noResultsItem.textContent = 'No results found';
              suggestionsDropdown.appendChild(noResultsItem);
         } else {
-            peopleData.forEach(person => {
+            peopleData.forEach((person, index) => { // Añadimos 'index' para el delay
                 if (!person.publicId) return;
 
                 const listItem = document.createElement('li');
                 listItem.classList.add('suggestion-item');
                 listItem.dataset.publicid = person.publicId;
+
+                // --- INICIO: Clave para la animación escalonada ---
+                // Aplicamos un retraso creciente a la animación de cada elemento
+                listItem.style.animationDelay = `${index * 50}ms`;
+                // --- FIN ---
 
                 const avatarDiv = document.createElement('div');
                 avatarDiv.classList.add('avatar');
@@ -67,6 +72,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderModalContent(data) {
+        let strengthsHtml = '<p>No strengths listed.</p>';
+        if (data.strengths && data.strengths.length > 0) {
+            strengthsHtml = `
+                <div class="strengths-list">
+                    ${data.strengths.map((strength, index) => `
+                        <div class="strength-item ${index >= 3 ? 'hidden' : ''}">
+                            <div class="name">${strength.name}</div>
+                            <div class="proficiency">${strength.proficiency ? strength.proficiency.replace('-', ' ') : ''}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            if (data.strengths.length > 3) {
+                strengthsHtml += '<button id="viewMoreStrengthsBtn" class="view-more-btn">View More</button>';
+            }
+        }
+
         modalContent.innerHTML = `
             <div class="modal-header">
                 <h2>${data.name || 'Unknown'}</h2>
@@ -74,44 +96,35 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="modal-body">
                 <p>${data.summary_of_bio || 'No summary available.'}</p>
-
                 <h3 class="modal-section-title">Statistics</h3>
                 <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="value">${data.stats_strengths}</div>
-                        <div class="label">Strengths</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value">${data.stats_jobs}</div>
-                        <div class="label">Jobs</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value">${data.stats_education}</div>
-                        <div class="label">Education</div>
-                    </div>
+                    <div class="stat-item"><div class="value">${data.stats_strengths}</div><div class="label">Strengths</div></div>
+                    <div class="stat-item"><div class="value">${data.stats_jobs}</div><div class="label">Jobs</div></div>
+                    <div class="stat-item"><div class="value">${data.stats_education}</div><div class="label">Education</div></div>
                 </div>
-
-                <h3 class="modal-section-title">Top Strength</h3>
-                ${data.top_strength_name ? `
-                    <div class="strength-highlight">
-                        <div class="name">${data.top_strength_name}</div>
-                        <div class="proficiency">${data.top_strength_proficiency.replace('-', ' ')}</div>
-                    </div>
-                ` : '<p>No strengths listed.</p>'}
-
+                <h3 class="modal-section-title">Strengths</h3>
+                ${strengthsHtml}
                 <h3 class="modal-section-title">Last Job</h3>
                 <p><strong>Period:</strong> ${data.last_job_period || 'N/A'}</p>
                 <p><strong>Location:</strong> ${data.location || 'N/A'}</p>
             </div>
         `;
+        
+        const viewMoreBtn = document.getElementById('viewMoreStrengthsBtn');
+        if (viewMoreBtn) {
+            viewMoreBtn.addEventListener('click', () => {
+                document.querySelectorAll('.strength-item.hidden').forEach(item => {
+                    item.classList.remove('hidden');
+                });
+                viewMoreBtn.style.display = 'none';
+            });
+        }
     }
 
-    // Función para abrir y cargar los datos del modal
     async function openProfileModal(username) {
         modalOverlay.classList.add('show');
         profileModal.classList.add('show');
         modalContent.innerHTML = '<div class="loader"></div>'; 
-
         try {
             const response = await fetch(`/api/person/${username}`);
             if (!response.ok) {
@@ -129,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeProfileModal() {
         modalOverlay.classList.remove('show');
         profileModal.classList.remove('show');
+        searchContainer.classList.remove('active');
         setTimeout(() => {
             modalContent.innerHTML = '';
         }, 300); 
@@ -157,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-
     searchInput.addEventListener('input', () => {
         const query = searchInput.value.trim();
         clearTimeout(debounceTimer);
@@ -185,8 +198,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+
     searchInput.addEventListener('focus', () => {
         searchBar.classList.add('focused');
+        searchContainer.classList.add('active');
         if (searchInput.value.trim().length > 0) {
             search(searchInput.value.trim());
         }
@@ -197,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             if (!modalOverlay.classList.contains('show')) {
                  suggestionsDropdown.style.display = 'none';
+                 searchContainer.classList.remove('active');
             }
         }, 200);
     });

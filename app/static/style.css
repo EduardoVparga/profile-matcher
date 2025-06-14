@@ -17,6 +17,11 @@ body {
     position: relative; 
     display: flex;
     flex-direction: column; 
+    transition: transform 0.4s ease-in-out;
+}
+
+.search-container.active {
+    transform: translateY(-15vh);
 }
 
 .search-bar {
@@ -51,7 +56,6 @@ body {
     transform: scaleX(1); 
 }
 
-
 .search-bar input {
     flex-grow: 1; 
     border: none;
@@ -73,14 +77,6 @@ body {
     cursor: pointer; 
 }
 
-.search-bar .search-icon {
-     /* margin-right se añade en el padding del input */
-}
-
-.search-bar .filter-icon {
-     /* margin-left se añade en el padding del input */
-}
-
 .separator {
     width: 1px; 
     height: 20px; 
@@ -99,8 +95,8 @@ body {
     max-height: 300px; 
     overflow-y: auto; 
     border-top: none; 
-    display: none; 
-    z-index: 1; 
+    z-index: 1;
+    display: none;
 }
 
 .suggestion-item {
@@ -109,7 +105,22 @@ body {
     padding: 12px 20px;
     cursor: pointer;
     border-bottom: 1px solid #4a4e55; 
+    
+    /* --- INICIO: Animación de entrada para cada item --- */
+    opacity: 0;
+    transform: translateX(-15px);
+    animation: fadeInItem 0.3s ease-out forwards; 
 }
+
+/* Define la animación keyframes para el desvanecimiento */
+@keyframes fadeInItem {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+/* --- FIN: Animación de entrada para cada item --- */
+
 
 .suggestion-item:last-child {
     border-bottom: none; 
@@ -133,19 +144,12 @@ body {
     overflow: hidden; 
 }
 
-.avatar.letter {
-    background-color: #fbbc05; 
-    color: #282c34; 
-    font-weight: bold;
-}
-
 .avatar img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover; 
 }
-
 
 .text-content {
     flex-grow: 1; 
@@ -161,7 +165,6 @@ body {
      color: #ffffff; 
 }
 
-
 .text-content .description {
     font-size: 0.85rem;
     color: #a0a0a0; 
@@ -174,26 +177,16 @@ body {
     margin-left: 10px;
 }
 
-.checked.hidden {
-    visibility: hidden;
-}
-
-
-/* ============ ESTILOS DEL MODAL ============ */
-
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-
     background-color: rgba(30, 32, 38, 0.6);
-
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px); 
-
-    display: none; 
+    -webkit-backdrop-filter: blur(10px);
+    display: none;
     justify-content: center;
     align-items: center;
     z-index: 1000;
@@ -217,12 +210,14 @@ body {
     position: relative;
     max-height: 85vh;
     overflow-y: auto;
-    transform: scale(0.95);
-    transition: transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(-20px) scale(0.98);
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
 }
 
 .modal-overlay.show .profile-modal {
-    transform: scale(1);
+    opacity: 1;
+    transform: translateY(0) scale(1);
 }
 
 .modal-close-btn {
@@ -320,21 +315,51 @@ body {
     margin-top: 5px;
 }
 
-.strength-highlight {
+.strengths-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.strength-item {
     background-color: #282c34;
     padding: 15px;
     border-radius: 8px;
     border-left: 4px solid #fbbc05;
+    transition: background-color 0.2s;
 }
 
-.strength-highlight .name {
+.strength-item .name {
     font-size: 1.1rem;
     font-weight: bold;
+    color: #ffffff;
 }
 
-.strength-highlight .proficiency {
+.strength-item .proficiency {
     font-size: 0.9rem;
     color: #a0a0a0;
     text-transform: capitalize;
     margin-top: 4px;
+}
+
+.strength-item.hidden {
+    display: none;
+}
+
+.view-more-btn {
+    background-color: transparent;
+    border: 1px solid #fbbc05;
+    color: #fbbc05;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 15px;
+    align-self: flex-start;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.view-more-btn:hover {
+    background-color: #fbbc05;
+    color: #282c34;
 }
