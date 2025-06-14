@@ -139,7 +139,7 @@ async def get_person_details(username: str):
                 stats_jobs=stats_data.get("jobs", 0),
                 stats_education=stats_data.get("education", 0),
                 stats_strengths=stats_data.get("strengths", 0),
-                strengths=processed_strengths, # Se pasa la lista completa
+                strengths=processed_strengths, 
                 last_job_period=last_job_period
             )
             return details

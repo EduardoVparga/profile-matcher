@@ -20,17 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
              noResultsItem.textContent = 'No results found';
              suggestionsDropdown.appendChild(noResultsItem);
         } else {
-            peopleData.forEach((person, index) => { // Añadimos 'index' para el delay
+            peopleData.forEach((person, index) => { 
                 if (!person.publicId) return;
 
                 const listItem = document.createElement('li');
                 listItem.classList.add('suggestion-item');
                 listItem.dataset.publicid = person.publicId;
 
-                // --- INICIO: Clave para la animación escalonada ---
-                // Aplicamos un retraso creciente a la animación de cada elemento
                 listItem.style.animationDelay = `${index * 50}ms`;
-                // --- FIN ---
 
                 const avatarDiv = document.createElement('div');
                 avatarDiv.classList.add('avatar');
